@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+const InputValidationError = require('../errors/inputvalidationerror');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
