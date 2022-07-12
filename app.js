@@ -8,11 +8,15 @@ const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 
 const usersRouter = require('./routes/users');
-/* const articlesRouter = require('./routes/articles'); */
+const articlesRouter = require('./routes/articles');
 const signInRouter = require('./routes/signin');
 const signUpRouter = require('./routes/signup');
 
+const auth = require('./middleware/auth');
 const errorHandler = require('./middleware/errorHandler');
+const { requestLogger, errorLogger } = require('./middleware/logger');
+
+const NotFoundError = require('./errors/notfounderror');
 
 const { PORT = 3000 } = process.env;
 
@@ -33,20 +37,20 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(cors());
 app.options('*', cors());
-/* app.use(requestLogger); */
+app.use(requestLogger);
 app.use(limiter);
 
 app.use('/signin', signInRouter);
 app.use('/signup', signUpRouter);
 
-app.use('/users', usersRouter);
-/* app.use('/articles', articlesRouter); */
+app.use('/users', auth, usersRouter);
+app.use('/articles', auth, articlesRouter);
 
 app.use('/', (req, res) => {
   throw new NotFoundError('Requested resource not found');
 });
 
-/* app.use(errorLogger); */
+app.use(errorLogger);
 app.use(errors());
 app.use(errorHandler);
 app.listen(PORT, () => {

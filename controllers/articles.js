@@ -4,7 +4,7 @@ const NotFoundError = require('../errors/notfounderror');
 const ForbiddenError = require('../errors/forbiddenerror');
 
 const getArticles = (req, res, next) => {
-  Card.find({ owner: req.user._id })
+  Article.find({ owner: req.user._id })
     .then((articles) => res.status(200).send({ data: articles }))
     .catch(next);
 };
@@ -35,6 +35,7 @@ const addArticle = (req, res, next) => {
 
 const deleteArticle = (req, res, next) => {
   Article.findById(req.params.articleId)
+    .select('+owner')
     .then((article) => {
       if (!article) {
         throw new NotFoundError('An article to be deleted not found');
@@ -49,7 +50,7 @@ const deleteArticle = (req, res, next) => {
     .then((article) => res.status(200).send({ data: article }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new NotFoundError('A card to be deleted not found');
+        throw new NotFoundError('An article to be deleted not found');
       } else {
         throw err;
       }
