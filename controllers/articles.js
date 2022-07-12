@@ -1,11 +1,16 @@
 const Article = require('../models/article');
+const {
+  ERROR_MESSAGES,
+  ERROR_NAMES,
+  STATUS_CODES,
+} = require('../utils/constants');
 const InputValidationError = require('../errors/inputvalidationerror');
 const NotFoundError = require('../errors/notfounderror');
 const ForbiddenError = require('../errors/forbiddenerror');
 
 const getArticles = (req, res, next) => {
   Article.find({ owner: req.user._id })
-    .then((articles) => res.status(200).send({ data: articles }))
+    .then((articles) => res.status(STATUS_CODES.ok).send({ data: articles }))
     .catch(next);
 };
 
@@ -22,11 +27,11 @@ const addArticle = (req, res, next) => {
     image,
     owner: req.user._id,
   })
-    .then((article) => res.status(201).send({ data: article }))
+    .then((article) => res.status(STATUS_CODES.created).send({ data: article }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === ERROR_NAMES.validationError) {
         throw new InputValidationError(
-          'Input validation failed: unable to add a new article'
+          ERROR_MESSAGES.articleInputValidationError
         );
       }
     })
@@ -38,19 +43,17 @@ const deleteArticle = (req, res, next) => {
     .select('+owner')
     .then((article) => {
       if (!article) {
-        throw new NotFoundError('An article to be deleted not found');
+        throw new NotFoundError(ERROR_MESSAGES.articleNotFound);
       } else if (article.owner.toString() !== req.user._id.toString()) {
-        throw new ForbiddenError(
-          'Unable to delete articles owned by another user'
-        );
+        throw new ForbiddenError(ERROR_MESSAGES.articleOwnedByAnotherUser);
       } else {
         return Article.deleteOne({ _id: req.params.articleId });
       }
     })
-    .then((article) => res.status(200).send({ data: article }))
+    .then((response) => res.status(STATUS_CODES.ok).send({ data: response }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new NotFoundError('An article to be deleted not found');
+      if (err.name === ERROR_NAMES.castError) {
+        throw new NotFoundError(ERROR_MESSAGES.articleNotFound);
       } else {
         throw err;
       }
