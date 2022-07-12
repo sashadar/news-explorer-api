@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { ERROR_MESSAGES } = require('../utils/constants');
 const LoginError = require('../errors/loginerror');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
@@ -19,7 +20,7 @@ module.exports = (req, res, next) => {
       NODE_ENV === 'production' ? JWT_SECRET : 'secret-string'
     );
   } catch (err) {
-    throw new LoginError('Authorization required');
+    throw new LoginError(ERROR_MESSAGES.userUnauthorized);
   }
 
   req.user = payload;
