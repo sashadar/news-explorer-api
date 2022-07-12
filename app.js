@@ -9,6 +9,10 @@ const rateLimit = require('express-rate-limit');
 
 const usersRouter = require('./routes/users');
 /* const articlesRouter = require('./routes/articles'); */
+const signInRouter = require('./routes/signin');
+const signUpRouter = require('./routes/signup');
+
+const errorHandler = require('./middleware/errorHandler');
 
 const { PORT = 3000 } = process.env;
 
@@ -31,6 +35,9 @@ app.use(cors());
 app.options('*', cors());
 /* app.use(requestLogger); */
 app.use(limiter);
+
+app.use('/signin', signInRouter);
+app.use('/signup', signUpRouter);
 
 app.use('/users', usersRouter);
 /* app.use('/articles', articlesRouter); */

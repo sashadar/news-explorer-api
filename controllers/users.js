@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const InputValidationError = require('../errors/inputvalidationerror');
 const NotFoundError = require('../errors/notfounderror');
+const DuplicateKeyError = require('../errors/duplicatekeyerror');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -41,6 +42,12 @@ const createUser = (req, res, next) => {
         throw new InputValidationError(
           'Input validation failed: unable to create user'
         );
+      } else if (err.message.includes('duplicate key')) {
+        throw new DuplicateKeyError(
+          'User with the same email address already exists'
+        );
+      } else {
+        throw err;
       }
     })
     .catch(next);

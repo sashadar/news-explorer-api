@@ -4,8 +4,8 @@ const { validateURL } = require('../validators/validators');
 
 const {
   getArticles,
-  createArticle,
-  deleteArticleById,
+  addArticle,
+  deleteArticle,
 } = require('../controllers/articles');
 
 router.get('/', getArticles);
@@ -23,7 +23,7 @@ router.post(
       image: Joi.string().required().custom(validateURL),
     }),
   }),
-  createArticle
+  addArticle
 );
 
 router.delete(
@@ -33,7 +33,7 @@ router.delete(
       articleId: Joi.string().required().hex().length(24),
     }),
   }),
-  deleteArticleById
+  deleteArticle
 );
 
 module.exports = router;
