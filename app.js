@@ -7,6 +7,9 @@ const cors = require('cors');
 const { errors } = require('celebrate');
 const rateLimit = require('express-rate-limit');
 
+const usersRouter = require('./routes/users');
+/* const articlesRouter = require('./routes/articles'); */
+
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -29,9 +32,16 @@ app.options('*', cors());
 /* app.use(requestLogger); */
 app.use(limiter);
 
+app.use('/users', usersRouter);
+/* app.use('/articles', articlesRouter); */
+
+app.use('/', (req, res) => {
+  throw new NotFoundError('Requested resource not found');
+});
+
 /* app.use(errorLogger); */
 app.use(errors());
-/* app.use(errorHandler); */
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`listening on port: ${PORT}`);
 });

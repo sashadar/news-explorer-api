@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const InputValidationError = require('../errors/inputvalidationerror');
+const NotFoundError = require('../errors/notfounderror');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -21,6 +22,8 @@ const getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new NotFoundError('User not found');
+      } else {
+        throw err;
       }
     })
     .catch(next);
