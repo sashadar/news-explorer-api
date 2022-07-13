@@ -6,6 +6,7 @@ const {
   ERROR_MESSAGES,
   ERROR_NAMES,
   STATUS_CODES,
+  JWT_SECRET_DEV,
 } = require('../utils/constants');
 const InputValidationError = require('../errors/inputvalidationerror');
 const NotFoundError = require('../errors/notfounderror');
@@ -65,7 +66,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'secret-string',
+        NODE_ENV === 'production' ? JWT_SECRET : JWT_SECRET_DEV,
         {
           expiresIn: '7d',
         }

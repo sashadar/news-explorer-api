@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const cors = require('cors');
 const { errors } = require('celebrate');
-const rateLimit = require('express-rate-limit');
+const { limiter } = require('./utils/limiter');
 
 const usersRouter = require('./routes/users');
 const articlesRouter = require('./routes/articles');
@@ -16,20 +16,15 @@ const auth = require('./middleware/auth');
 const errorHandler = require('./middleware/errorHandler');
 const { requestLogger, errorLogger } = require('./middleware/logger');
 
+const { ERROR_MESSAGES, DB_ADDRESS } = require('./utils/constants');
+
 const NotFoundError = require('./errors/notfounderror');
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
-
-mongoose.connect('mongodb://localhost:27017/newsexplorerdb', {
+mongoose.connect(DB_ADDRESS, {
   useNewUrlParser: true,
 });
 
@@ -47,7 +42,7 @@ app.use('/users', auth, usersRouter);
 app.use('/articles', auth, articlesRouter);
 
 app.use('/', (req, res) => {
-  throw new NotFoundError('Requested resource not found');
+  throw new NotFoundError(ERROR_MESSAGES.resourceNotFound);
 });
 
 app.use(errorLogger);
